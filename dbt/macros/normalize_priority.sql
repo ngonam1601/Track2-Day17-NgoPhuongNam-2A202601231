@@ -54,7 +54,18 @@
     --         ...
     --         else null                        -- nhóm 3
     --     end
-    try_cast({{ col }} as integer)
+
+    case 
+        -- Nhóm 1: số hợp lệ 1..4 
+        when try_cast({{ col }} as integer) between 1 and 4 then try_cast({{ col }} as integer) 
+        -- Nhóm 2: nhãn chữ do schema evolution 
+        when lower(trim(cast({{ col }} as varchar))) = 'urgent' then 1 
+        when lower(trim(cast({{ col }} as varchar))) = 'high' then 2 
+        when lower(trim(cast({{ col }} as varchar))) = 'medium' then 3 
+        when lower(trim(cast({{ col }} as varchar))) = 'low' then 4 
+        -- Nhóm 3: dữ liệu không hợp lệ 
+        else null 
+    end
 {% endmacro %}
 
 
